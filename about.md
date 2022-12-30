@@ -57,15 +57,15 @@ My first job was with the Partner Accounting and Reporting team of Enabling Area
 More information about what I learned can be found in the posts below.
 
 1. [Fabrication of SAW Devices](/2022/12/28/fabrication-SAW/)
-2. [Deep Double Descent](/2012/02/07/example-content/)
+2. [Deep Double Descent](/2022/12/29/double-descent/)
 
-For more information on my time at Purdue University, West Lafayette look at the blog below:
+<!-- For more information on my time at Purdue University, West Lafayette look at the blog below: -->
 
 <!-- 1. [Fall 2022](//) -->
 
 ## Contacts
 
 You can find me at:
-* [Resume]()
+* [Resume](https://drive.google.com/file/d/1x2RA8Mip7qrlteXKvZfxyxWrxE50HgRA/view?usp=sharing)
 * [Github](https://github.com/Shreya-gaur)
 * [LinkedIn](https://www.linkedin.com/in/shreya-gaur22599/)

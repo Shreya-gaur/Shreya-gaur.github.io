@@ -8,6 +8,23 @@ title: Example content
   Howdy! This is an example blog post that shows several types of HTML content supported in this theme.
 </div>
 
+notes:
+
+Computer Architecture: Simulation of Load Value Prediction in Gem5 Sim-
+ulator Fall 2022
+Implementing the Load Value Prediction mechanism in Gem5. Primarily involved cod-
+ing extensively in C++ and Python. December
+2022
+• Technology/Tools: Course Specific Gem5
+Advanced Software Engineering: Study of reproducibility challenge in ML
+approach to Software Quality Assessment. Fall 2022
+Conducting a survey study to examine how consistent the deep learning models pro-
+posed are and whether their performance can be replicated.
+• Technology/Tools: Python - Keras
+
+
+
+
 Cum sociis natoque penatibus et magnis <a href="#">dis parturient montes</a>, nascetur ridiculus mus. *Aenean eu leo quam.* Pellentesque ornare sem lacinia quam venenatis vestibulum. Sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum.
 
 > Curabitur blandit tempus porttitor. Nullam quis risus eget urna mollis ornare vel eu leo. Nullam id dolor id nibh ultricies vehicula ut id elit.
