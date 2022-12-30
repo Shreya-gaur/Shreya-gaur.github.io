@@ -21,6 +21,9 @@ author:
 
 paginate:         5
 
+kramdown:  
+  parse_block_html: true
+
 # Custom vars
 version:          2.1.0
 
