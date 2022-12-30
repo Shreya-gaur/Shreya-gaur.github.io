@@ -3,10 +3,6 @@ layout: page
 title: About
 ---
 
-<!-- Author's note -->
-<!-- <p class="message"> -->
-<!-- </p> -->
-
 <style>body {text-align: justify}</style>
 
 Hey there! My name is Shreya Gaur and I am currently a student at Purdue University in West Lafayette Indiana. I am doing my masters in Electrical and Computer Engineering.
