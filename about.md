@@ -5,13 +5,9 @@ title: About
 
 <style>body {text-align: justify}</style>
 
-Hey there! My name is Shreya Gaur and I am currently a student at Purdue University in West Lafayette Indiana. I am doing my masters in Electrical and Computer Engineering.
+Hey there! My name is Shreya Gaur and I am currently a student at Purdue University in West Lafayette Indiana. I am doing my masters in Electrical and Computer Engineering. Before coming to Purdue, I got my Bachelor's in Electronics and Communication Engineering from SSN College of Engineering, Tamil Nadu, India and then worked for an year in Deloitte USI. You can find more information about my credentials on this website. During my career and studies at SSN, I had the opportunity to work with the organisations mentioned on this page. I worked on independent projects in each of these places and learned a lot.  
 
-Before coming to Purdue, I got my Bachelor's in Electronics and Communication Engineering from SSN College of Engineering, Tamil Nadu, India and then worked for an year in Deloitte USI. 
-
-You are currently viewing my website. I elaborate on my work and studies at university here and share my the knowledge that I have gained, in hopes that someone may find it useful. You can also find more information about my credentials here.
-
-During my career and studies at SSN, I had the opportunity to work with the following organisations. I worked on independent projects in each of these places and learned a lot. 
+In the Blogs Section, I elaborate on my work and studies at SSN and Purdue University. I share the knowledge that I have gained in hopes that someone may find it useful.
 
 
 #### 2019
