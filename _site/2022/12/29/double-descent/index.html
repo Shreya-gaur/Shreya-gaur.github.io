@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+  <head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+    
+      Deep Double Descent in Convolutional Neural Network &middot; Shreya Gaur
+    
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/public/css/poole.css">
+  <link rel="stylesheet" href="/public/css/syntax.css">
+  <link rel="stylesheet" href="/public/css/hyde.css">
+
+  <!-- <link rel="stylesheet" href="/public/css/poole.css">
+  <link rel="stylesheet" href="/public/css/syntax.css">
+  <link rel="stylesheet" href="/public/css/hyde.css"> -->
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  <!-- Icons -->
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/public/apple-touch-icon-144-precomposed.png">
+                                 <link rel="shortcut icon" href="/public/favicon.ico">
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
+</head>
+
+
+  <body class="layout-reverse">
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>
+        <img class="sidebar-nav-item" src="\images\ProfilePic.jpg";
+             style="object-fit:scale-down;
+                    width: 500px;
+                    height:250px;"/>
+        <a href="/"> 
+          Shreya Gaur
+        </a>
+      </h1>
+      <p class="lead"></p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="/">Blogs</a>
+
+      
+
+      
+      
+        
+          
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/about/">About</a>
+          
+        
+      
+        
+      
+        
+          
+        
+      
+
+      <a class="sidebar-nav-item" href="https://drive.google.com/file/d/1x2RA8Mip7qrlteXKvZfxyxWrxE50HgRA/view?usp=sharing">Resume</a>
+      <a class="sidebar-nav-item" href="https://github.com/Shreya-gaur">GitHub Profile</a>
+      <span class="sidebar-nav-item">Currently v2.1.0</span>
+    </nav>
+
+    <p>&copy; 2023. All rights reserved.</p>
+  </div>
+</div>
+
+
+    <div class="content container">
+      <div class="post">
+  <h1 class="post-title">Deep Double Descent in Convolutional Neural Network</h1>
+  <span class="post-date">29 Dec 2022</span>
+  <style>body {text-align: justify}</style>
+
+<h3 id="introduction-to-deep-double-descent">Introduction to Deep Double Descent</h3>
+
+<p>The phenomenon of deep double descent was first postulate by Belkin et. al(2018). Belkin worked with the
+neural network and observed that when one increases the width of a network(i.e., increase number of
+neurones), the test error appears to increase for a range of width and then decreases and saturates. This
+observation was reported continuously for different kinds of network architectures by even the predecessors
+of Belkin including Opper (1995; 2001), Advani &amp; Saxe (2017), Spigler et al. (2018), and Geiger et al.
+(2019b).</p>
+
+<p>The reason behind such an increase and then, decrease in the test error can be understood by combining two
+conventional thought processes for the question ‘Whether larger models are better or worse?’. The two
+conventional viewpoints can be understood as such,</p>
+<ul>
+  <li>Bias Variance trade-off - The bias is a measure of how well the data performs on training dataset, whereas,
+the variance is a measure of how well the model performs on test dataset given it trained upon a given
+training dataset. The concept of Bias-Variance trade off is a fundamental concept of classical statistical
+theory. According to the concept, after certain threshold width, the model starts to ‘overfit’ the training
+dataset hence it performs poorly on the test data and it’s generalisation capability decreases. Therefore the
+understanding is that the ‘larger models are worse’.</li>
+  <li>The modern neural networks do not exhibit any such circumstance. The larger models have more
+parameters hence are able to fit even random labels. Hence, the understanding becomes that ‘larger models
+are better’.</li>
+</ul>
+
+<p><img src="\images\dd01.png" alt="dd01" /></p>
+
+<p>The double descent is not only observed in case of varying model width but also in case of varying number
+of epochs as discussed in the paper by Preetum Nakkiran et al.(2019). The paper also describes a measure of
+complexity of model called effective model complexity and describes in detail the regions of the width versus
+test error graph as shown in figure 1.</p>
+
+<h3 id="experimental-setup">Experimental Setup</h3>
+<h4 id="dataset">Dataset</h4>
+<p>A study was conducted initially to understand which dataset to work with considering the training time taken 
+to train upon CIFAR10 and CIFAR100. Run times were compared for the required architectures with 
+CIFAR10 and CIFAR100. It was observed that working on CIFAR10, gives better results in terms of time 
+and accuracy considering it has 10 classes. The performance on CIFAR100 data proved to be comparable to 
+that on CIFAR10 in terms of runtime but accuracy suffers as it has 100 classes.</p>
+
+<p><img src="\images\dd02.png" alt="dd02" /></p>
+
+<p>Note: Originally, in the paper by Preetam Nakkiran et al.(2019), the model was trained with Adam Optimiser for 
+4000 epochs. At the current speed of training, training CNN on CIFAR100 for 4000 steps would take 15 hours 
+approximately.</p>
+
+<h4 id="architecture">Architecture</h4>
+<p>Two of the architectures tested upon are based on the architectures used in the paper by Preetum 
+Nakkiran(2019), where as, BCNN were added in the later part of the study. The following are the 
+architectures considered:</p>
+<ol>
+  <li>Convolutional Neural Network - The CNN5 was used with layer width parameter as c, where the layer 
+width varies [c, 2c, 4c, 5c] for the Convolutional layers. It was observed the base line model with c equal 
+to 60 gives 80% accuracy on the CIFAR10 dataset.</li>
+  <li>Residual Neural Network - The ResNet18 architecture was employed with each ResNet block has it’s 
+width varying in the same fashion i.e, [c, 2c, 4c, 8c] for the Convolutional layers.</li>
+  <li>Binarised CNN - The BCNN was introduced later in the study to try and observe the interpolation 
+effect(double descent) phenomenon. The basic structure of network is exactly the same as that of CNN5 
+but with quantised convolutional layers introduced. Also, the BCNN unlike CNN5 is trained using Keras, 
+not Pytorch.</li>
+</ol>
+
+<h4 id="number-of-epochs">Number of Epochs</h4>
+<p>The models of CNN and ResNet architectures are all trained for 40 epochs and mini-batch size of 128 due 
+to computational constraint as only Google Colab’s Tesla GPU was used. The random seed of 0 is added in 
+order to make sure the output remains constant for a value of c. It was still observed that there was certain 
+variability between the values of test error obtained for each width parameter value. 
+BCNN on the other hand has been analysed for two cases epoch 40 and epoch 400, as training of BCNN is 
+considerably faster than CNN5. Understandably so, it is because of the better memory utilisation and use of 
+bit wise operations instead of arithmetic ones that are used in CNN5. For better understanding, kindly refer 
+to the paper [2] by Benjio et al.</p>
+
+<h4 id="optimization">Optimization</h4>
+<p>The standard adam optimiser is utilised with a learning rate of 10-4 for all the architectures.</p>
+
+<h4 id="regularisation">Regularisation</h4>
+<p>No regularisation technique was utilised. Further study is required to see the impact of regularisation upon 
+double descent phenomenon.</p>
+
+<h4 id="experiments-and-results">Experiments and Results</h4>
+<p>The main objective of each experiment conducted is to observe the interpolation phenomenon in CNN5, 
+ResNet18 and BCNN. The experiment conducted in case of each architecture is explained below,</p>
+<h5 id="cnn5">CNN5</h5>
+<p>The Pytorch platform was used in order to try and observe the double descent phenomenon after the plotting 
+of test errors for values of width parameter c. The c values were chosen at an interval of 5, starting with 1, 
+up till 65. For each of c values the test error and train error attained, is plotted on the graph. Double descent 
+phenomenon was observed only in one out of five tries with the complete width value set. There was greater 
+variability between each experiment try result. And nothing could be predicted conclusively with respect why 
+such a thing is happening, as double descent issue should be observed in all tried. It was however assumed 
+that this issue may be due to the fact that the model is trained for very less number of epochs(40 epochs) due 
+to the computational constraint. However, it was observed that the test error while trying to approach zero, 
+saturates near the value of 0.15(15%) test error as can be seen in the Figure 2.</p>
+
+<p><img src="\images\dd03.png" alt="dd03" /></p>
+
+<h5 id="resnet18">ResNet18</h5>
+<p>The Pytorch platform was used in order to try and observe the double descent phenomenon after the plotting 
+of test errors and train errors for values of width parameter c. The c values were chosen at an interval of 5, 
+starting with 1, up till 40. For each of c values the test error and train error attained, is plotted on the graph. 
+There was no instance where double descent presented itself out of the 7 trials made. The graph showing 
+width parameter on the x axis and the test and train errors on the y axis for one of the trials can be observed 
+in figure 4 given</p>
+
+<p><img src="\images\dd04.png" alt="dd04" /></p>
+
+<h5 id="bcnn">BCNN</h5>
+<p>There are two experiments conducted with respect to Binarise CNN. The experiment unlike the previous 
+ones before is conducted on Keras instead on Pytorch. The change in choice was made because of the 
+availability of larq library which can be used to get the quantised convolution layers and maxpool layers. The 
+experiments conducted are:</p>
+
+<p>a. Varying the width parameter
+This experiment is same as the one conducted for the CNN5 and ResNet18. The width parameters are 
+varied and the test and train errors are noted. The experiment is conducted for 40 and 400 epochs. The 
+experiment is conducted for 40 epochs to compare the performance with the CNN5 and ResNet18 
+performances for the same number of epochs. The figure 5 and figure 6 show the performance with respect 
+to 40 and 400 epochs respectively, where width varies from 1 to 40. As one can observe here, there was no 
+concrete appearance of double descent even after 6 trials.</p>
+
+<p><img src="\images\dd05.png" alt="dd05" /></p>
+
+<p>b. Varying the number of CNN layer
+Here, we try to understand how the test and train errors vary with respect to the addition of more CNN 
+layers. The layers added are added with “same” padding and of the same width equal to 4c. The number of 
+epochs used is 400. The minimum number of CNN layers is 3 with widths [c, 2c, 4c]. The performance of 
+the model with respect to varying number of CNN layers is shown in the figure 7.</p>
+
+<p><img src="\images\dd06.png" alt="dd06" /></p>
+
+<p>Given in the figure 8 is the table summarising what values of test and train error do the models saturate at 
+when the width parameter is varied.</p>
+
+<p><img src="\images\dd07.png" alt="dd07" /></p>
+
+<h3 id="inference">Inference</h3>
+<p>To, draw any concrete conclusions from this study would be too soon. But several inferences can be drawn 
+including:</p>
+<ul>
+  <li>Double descent does not show for lower number of epochs.</li>
+  <li>The test error doesn’t follow any known trend when number of CNN layers is increased.</li>
+  <li>BNN performed very effectively with the training set but not so much with the test one.</li>
+</ul>
+
+<h3 id="future-work">Future Work</h3>
+<p>The next stage of the study involves a comparative study between CNN and BCNN to formulate a 
+benchmark to predict the performance of a CNN architecture by training it’s corresponding BCNN on the 
+same datasets. For people with limited computational resources, it can be a good way of evaluating 
+architecture performance on their dataset in less amount of time and higher number of epochs. This study 
+would be based upon the observation the BCNN takes very less time in training for higher number of epochs 
+as compared to CNN.</p>
+
+<h3 id="references">References</h3>
+<ol>
+  <li>Preetum Nakkiran et al. (2019), Deep Double Descent: where bigger model and more data hurt?</li>
+  <li>Itay Hubara et al. (2016), Binarized Neural Network</li>
+</ol>
+
+</div>
+
+<div class="related">
+  <h2>Related Posts</h2>
+  <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/2022/12/28/fabrication-SAW/">
+            Fabrication of SAW Devices
+            <small>28 Dec 2022</small>
+          </a>
+        </h3>
+      </li>
+    
+  </ul>
+</div>
+
+    </div>
+
+  </body>
+</html>

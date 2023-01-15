@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+ <title>Shreya Gaur</title>
+ <link href="http://localhost:4000/atom.xml" rel="self"/>
+ <link href="http://localhost:4000/"/>
+ <updated>2023-01-15T11:20:47-05:00</updated>
+ <id>http://localhost:4000</id>
+ <author>
+   <name>Shreya Gaur</name>
+   <email></email>
+ </author>
+
+ 
+ <entry>
+   <title>Deep Double Descent in Convolutional Neural Network</title>
+   <link href="http://localhost:4000/2022/12/29/double-descent/"/>
+   <updated>2022-12-29T00:00:00-05:00</updated>
+   <id>http://localhost:4000/2022/12/29/double-descent</id>
+   <content type="html">&lt;style&gt;body {text-align: justify}&lt;/style&gt;
+
+&lt;h3 id=&quot;introduction-to-deep-double-descent&quot;&gt;Introduction to Deep Double Descent&lt;/h3&gt;
+
+&lt;p&gt;The phenomenon of deep double descent was first postulate by Belkin et. al(2018). Belkin worked with the
+neural network and observed that when one increases the width of a network(i.e., increase number of
+neurones), the test error appears to increase for a range of width and then decreases and saturates. This
+observation was reported continuously for different kinds of network architectures by even the predecessors
+of Belkin including Opper (1995; 2001), Advani &amp;amp; Saxe (2017), Spigler et al. (2018), and Geiger et al.
+(2019b).&lt;/p&gt;
+
+&lt;p&gt;The reason behind such an increase and then, decrease in the test error can be understood by combining two
+conventional thought processes for the question ‘Whether larger models are better or worse?’. The two
+conventional viewpoints can be understood as such,&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Bias Variance trade-off - The bias is a measure of how well the data performs on training dataset, whereas,
+the variance is a measure of how well the model performs on test dataset given it trained upon a given
+training dataset. The concept of Bias-Variance trade off is a fundamental concept of classical statistical
+theory. According to the concept, after certain threshold width, the model starts to ‘overfit’ the training
+dataset hence it performs poorly on the test data and it’s generalisation capability decreases. Therefore the
+understanding is that the ‘larger models are worse’.&lt;/li&gt;
+  &lt;li&gt;The modern neural networks do not exhibit any such circumstance. The larger models have more
+parameters hence are able to fit even random labels. Hence, the understanding becomes that ‘larger models
+are better’.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&quot;\images\dd01.png&quot; alt=&quot;dd01&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The double descent is not only observed in case of varying model width but also in case of varying number
+of epochs as discussed in the paper by Preetum Nakkiran et al.(2019). The paper also describes a measure of
+complexity of model called effective model complexity and describes in detail the regions of the width versus
+test error graph as shown in figure 1.&lt;/p&gt;
+
+&lt;h3 id=&quot;experimental-setup&quot;&gt;Experimental Setup&lt;/h3&gt;
+&lt;h4 id=&quot;dataset&quot;&gt;Dataset&lt;/h4&gt;
+&lt;p&gt;A study was conducted initially to understand which dataset to work with considering the training time taken 
+to train upon CIFAR10 and CIFAR100. Run times were compared for the required architectures with 
+CIFAR10 and CIFAR100. It was observed that working on CIFAR10, gives better results in terms of time 
+and accuracy considering it has 10 classes. The performance on CIFAR100 data proved to be comparable to 
+that on CIFAR10 in terms of runtime but accuracy suffers as it has 100 classes.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;\images\dd02.png&quot; alt=&quot;dd02&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Note: Originally, in the paper by Preetam Nakkiran et al.(2019), the model was trained with Adam Optimiser for 
+4000 epochs. At the current speed of training, training CNN on CIFAR100 for 4000 steps would take 15 hours 
+approximately.&lt;/p&gt;
+
+&lt;h4 id=&quot;architecture&quot;&gt;Architecture&lt;/h4&gt;
+&lt;p&gt;Two of the architectures tested upon are based on the architectures used in the paper by Preetum 
+Nakkiran(2019), where as, BCNN were added in the later part of the study. The following are the 
+architectures considered:&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;Convolutional Neural Network - The CNN5 was used with layer width parameter as c, where the layer 
+width varies [c, 2c, 4c, 5c] for the Convolutional layers. It was observed the base line model with c equal 
+to 60 gives 80% accuracy on the CIFAR10 dataset.&lt;/li&gt;
+  &lt;li&gt;Residual Neural Network - The ResNet18 architecture was employed with each ResNet block has it’s 
+width varying in the same fashion i.e, [c, 2c, 4c, 8c] for the Convolutional layers.&lt;/li&gt;
+  &lt;li&gt;Binarised CNN - The BCNN was introduced later in the study to try and observe the interpolation 
+effect(double descent) phenomenon. The basic structure of network is exactly the same as that of CNN5 
+but with quantised convolutional layers introduced. Also, the BCNN unlike CNN5 is trained using Keras, 
+not Pytorch.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h4 id=&quot;number-of-epochs&quot;&gt;Number of Epochs&lt;/h4&gt;
+&lt;p&gt;The models of CNN and ResNet architectures are all trained for 40 epochs and mini-batch size of 128 due 
+to computational constraint as only Google Colab’s Tesla GPU was used. The random seed of 0 is added in 
+order to make sure the output remains constant for a value of c. It was still observed that there was certain 
+variability between the values of test error obtained for each width parameter value. 
+BCNN on the other hand has been analysed for two cases epoch 40 and epoch 400, as training of BCNN is 
+considerably faster than CNN5. Understandably so, it is because of the better memory utilisation and use of 
+bit wise operations instead of arithmetic ones that are used in CNN5. For better understanding, kindly refer 
+to the paper [2] by Benjio et al.&lt;/p&gt;
+
+&lt;h4 id=&quot;optimization&quot;&gt;Optimization&lt;/h4&gt;
+&lt;p&gt;The standard adam optimiser is utilised with a learning rate of 10-4 for all the architectures.&lt;/p&gt;
+
+&lt;h4 id=&quot;regularisation&quot;&gt;Regularisation&lt;/h4&gt;
+&lt;p&gt;No regularisation technique was utilised. Further study is required to see the impact of regularisation upon 
+double descent phenomenon.&lt;/p&gt;
+
+&lt;h4 id=&quot;experiments-and-results&quot;&gt;Experiments and Results&lt;/h4&gt;
+&lt;p&gt;The main objective of each experiment conducted is to observe the interpolation phenomenon in CNN5, 
+ResNet18 and BCNN. The experiment conducted in case of each architecture is explained below,&lt;/p&gt;
+&lt;h5 id=&quot;cnn5&quot;&gt;CNN5&lt;/h5&gt;
+&lt;p&gt;The Pytorch platform was used in order to try and observe the double descent phenomenon after the plotting 
+of test errors for values of width parameter c. The c values were chosen at an interval of 5, starting with 1, 
+up till 65. For each of c values the test error and train error attained, is plotted on the graph. Double descent 
+phenomenon was observed only in one out of five tries with the complete width value set. There was greater 
+variability between each experiment try result. And nothing could be predicted conclusively with respect why 
+such a thing is happening, as double descent issue should be observed in all tried. It was however assumed 
+that this issue may be due to the fact that the model is trained for very less number of epochs(40 epochs) due 
+to the computational constraint. However, it was observed that the test error while trying to approach zero, 
+saturates near the value of 0.15(15%) test error as can be seen in the Figure 2.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;\images\dd03.png&quot; alt=&quot;dd03&quot; /&gt;&lt;/p&gt;
+
+&lt;h5 id=&quot;resnet18&quot;&gt;ResNet18&lt;/h5&gt;
+&lt;p&gt;The Pytorch platform was used in order to try and observe the double descent phenomenon after the plotting 
+of test errors and train errors for values of width parameter c. The c values were chosen at an interval of 5, 
+starting with 1, up till 40. For each of c values the test error and train error attained, is plotted on the graph. 
+There was no instance where double descent presented itself out of the 7 trials made. The graph showing 
+width parameter on the x axis and the test and train errors on the y axis for one of the trials can be observed 
+in figure 4 given&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;\images\dd04.png&quot; alt=&quot;dd04&quot; /&gt;&lt;/p&gt;
+
+&lt;h5 id=&quot;bcnn&quot;&gt;BCNN&lt;/h5&gt;
+&lt;p&gt;There are two experiments conducted with respect to Binarise CNN. The experiment unlike the previous 
+ones before is conducted on Keras instead on Pytorch. The change in choice was made because of the 
+availability of larq library which can be used to get the quantised convolution layers and maxpool layers. The 
+experiments conducted are:&lt;/p&gt;
+
+&lt;p&gt;a. Varying the width parameter
+This experiment is same as the one conducted for the CNN5 and ResNet18. The width parameters are 
+varied and the test and train errors are noted. The experiment is conducted for 40 and 400 epochs. The 
+experiment is conducted for 40 epochs to compare the performance with the CNN5 and ResNet18 
+performances for the same number of epochs. The figure 5 and figure 6 show the performance with respect 
+to 40 and 400 epochs respectively, where width varies from 1 to 40. As one can observe here, there was no 
+concrete appearance of double descent even after 6 trials.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;\images\dd05.png&quot; alt=&quot;dd05&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;b. Varying the number of CNN layer
+Here, we try to understand how the test and train errors vary with respect to the addition of more CNN 
+layers. The layers added are added with “same” padding and of the same width equal to 4c. The number of 
+epochs used is 400. The minimum number of CNN layers is 3 with widths [c, 2c, 4c]. The performance of 
+the model with respect to varying number of CNN layers is shown in the figure 7.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;\images\dd06.png&quot; alt=&quot;dd06&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Given in the figure 8 is the table summarising what values of test and train error do the models saturate at 
+when the width parameter is varied.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;\images\dd07.png&quot; alt=&quot;dd07&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;inference&quot;&gt;Inference&lt;/h3&gt;
+&lt;p&gt;To, draw any concrete conclusions from this study would be too soon. But several inferences can be drawn 
+including:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Double descent does not show for lower number of epochs.&lt;/li&gt;
+  &lt;li&gt;The test error doesn’t follow any known trend when number of CNN layers is increased.&lt;/li&gt;
+  &lt;li&gt;BNN performed very effectively with the training set but not so much with the test one.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;future-work&quot;&gt;Future Work&lt;/h3&gt;
+&lt;p&gt;The next stage of the study involves a comparative study between CNN and BCNN to formulate a 
+benchmark to predict the performance of a CNN architecture by training it’s corresponding BCNN on the 
+same datasets. For people with limited computational resources, it can be a good way of evaluating 
+architecture performance on their dataset in less amount of time and higher number of epochs. This study 
+would be based upon the observation the BCNN takes very less time in training for higher number of epochs 
+as compared to CNN.&lt;/p&gt;
+
+&lt;h3 id=&quot;references&quot;&gt;References&lt;/h3&gt;
+&lt;ol&gt;
+  &lt;li&gt;Preetum Nakkiran et al. (2019), Deep Double Descent: where bigger model and more data hurt?&lt;/li&gt;
+  &lt;li&gt;Itay Hubara et al. (2016), Binarized Neural Network&lt;/li&gt;
+&lt;/ol&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Fabrication of SAW Devices</title>
+   <link href="http://localhost:4000/2022/12/28/fabrication-SAW/"/>
+   <updated>2022-12-28T00:00:00-05:00</updated>
+   <id>http://localhost:4000/2022/12/28/fabrication-SAW</id>
+   <content type="html">&lt;style&gt;body {text-align: justify}&lt;/style&gt;
+
+&lt;h3 id=&quot;understanding-surface-acoustic-waves&quot;&gt;Understanding Surface acoustic Waves&lt;/h3&gt;
+
+&lt;p&gt;The surface acoustic wave(SAW) is an acoustic wave traveling along the surface of a material exhibiting elasticity. These waves are the modes of propagation of elastic energy along the surface of the solid, whose displacement amplitude undergoes exponential decay. The SAW devices were first discovered by Lord Rayleigh in 1885, hence, SAW is also called Rayleigh waves. The Rayleigh waves have longitudinal and vertical shear components that can couple with any media in contact with the surface. This coupling strongly affects the amplitude and velocity of the wave, allowing SAW sensors to directly sense mass and mechanical properties.&lt;/p&gt;
+
+&lt;p&gt;Here, in SAW devices we will confine ourselves to the surface acoustic waves observed in case of a piezoelectric solid. A piezoelectric solid is the one which possesses the unique ability to transduce mechanical stress applied on it, into the form of a current and vice versa. Transduction refers to the conversion of one energy into another. Here, this transduction of mechanical stress into electrical current in the piezoelectric material is called the piezoelectric effect.&lt;/p&gt;
+
+&lt;h5 id=&quot;structure--working-of-saw-device&quot;&gt;Structure &amp;amp; Working of SAW Device&lt;/h5&gt;
+&lt;p&gt;If one considers the basic structure of a SAW device, it constitutes a substrate topped by a layer of piezoelectric solid and then, two IDTs, i.e., the input IDT and output IDT. The structure is clearly illustrated in the figure given below.&lt;/p&gt;
+
+&lt;!-- Image here for SAW Device--&gt;
+
+&lt;p&gt;&lt;img src=&quot;\images\Fab01.jpg&quot; alt=&quot;Fab01&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;IDT stands for inter digital transducer. The IDTs are made using mono photolithography, which is discussed in detail later in the report. When an AC voltage is provided to the input IDT. The input AC voltage is converted to a form of surface acoustic wave, as the IDT is mounted on piezoelectric layer. The SAW propagates through the delay region to eventually reach the output IDT. The output IDT does the opposite of input IDT and converts the vibration applied to itself into an AC voltage. This voltage received is recorded and made sense out of in many of the SAW device applications.&lt;/p&gt;
+
+&lt;p&gt;The finger-like structure in the IDTs are actually electrodes made out of a metal. The metal used in the study for this purpose is Aluminum.&lt;/p&gt;
+
+&lt;p&gt;In the fabrication of SAW devices, ZnO is the piezoelectric solid used. One might ask why ZnO is used, there are other piezoelectric materials available like quartz, LiTaO3, LiNbO3, etc, as well. The answer lies in the layered structure of ZnO, which allows relatively higher SAW propagation velocity (5000 m/s). The other piezoelectric materials like quartz, LiTaO3, etc, show less SAW propagation velocity, i.e., in the range of 3000 to 4000 m/s.&lt;/p&gt;
+
+&lt;p&gt;In all honesty, diamond materials possess the highest SAW propagation velocity of about 11000m/s, but the poly-crystalline diamond layers grown by hot filament CVD process usually have very large grain size and rough surface, which requires a huge amount of mechanical polishing to improve surface smoothness to a level good enough to be used in the fabrication process of SAW devices (Ra~5nm). Such processes are very time consuming and expensive. Hence, we can strike off diamond materials from the list of piezoelectric solids that can be used. But if you are really not under the constraint of budget, there are nanocrystalline diamond materials which don’t require such post-polishing processes and can be used for fabrication of SAW devices. In the study mentioned, however, we stick with ZnO.&lt;/p&gt;
+
+&lt;h3 id=&quot;fabrication-processes&quot;&gt;Fabrication Processes&lt;/h3&gt;
+
+&lt;p&gt;A number of processes are carried out on a given substrate to fabricate a SAW device. In our study, as mentioned above we use two substrates. First is passivated silicon wafer. By the term “passivated”, we mean that there is a layer of Silicon oxide (SiO2) on the wafer, 2-4µm thick. The layer of SiO2 is said to be the ‘sacrificial’ layer.&lt;/p&gt;
+
+&lt;p&gt;The second substrate used is corning glass. Corning is the name of the company which produces this unique glass. The specialty of this glass is that it can withstand a temperature of 600°C, whereas other glasses can’t possibly tolerate such a high temperature, they might melt.&lt;/p&gt;
+
+&lt;p&gt;The processes involved in fabrication of a SAW devices are mentioned below sequentially:&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;Sputtering&lt;/li&gt;
+  &lt;li&gt;Electron beam deposition&lt;/li&gt;
+  &lt;li&gt;Mono photo-lithography&lt;/li&gt;
+  &lt;li&gt;Developing&lt;/li&gt;
+  &lt;li&gt;Etching&lt;/li&gt;
+  &lt;li&gt;IV characteristics check&lt;/li&gt;
+  &lt;li&gt;Packaging&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h4 id=&quot;sputtering&quot;&gt;SPUTTERING&lt;/h4&gt;
+
+&lt;p&gt;Sputtering, by definition, is the deposition of metal or a target material on a surface by using fast ions to eject particles of it from the target. It can also be seen as the plasma etching of target material. As we know from the design, we need a thin layer of ZnO on the substrate. This layer is achieved by using the process of sputtering. The sputtering is of various kind based upon how the fast moving ions are achieved. However, we have used RF sputtering to achieve the required results, i.e., 4µm thick layer of ZnO.&lt;/p&gt;
+
+&lt;h5 id=&quot;theory-of-rf-sputtering&quot;&gt;Theory of RF sputtering&lt;/h5&gt;
+&lt;p&gt;Plasma is one of the four fundamental states of matter. It is formed when an inert gas, like Argon, helium, argon, etc., get ionized upon being subjected to a very high intensity electric field. In sputtering, plasma plays the major role of removing molecules from target material’s surface by transferring their own momentum into them. Ar+ is the ion used in the sputtering process.&lt;/p&gt;
+
+&lt;p&gt;Radio frequency is used to form the plasma. It is used to ionize the Argon, introduced into the system, which is a very significant step in the process of sputtering. These Ar+ ions then bombard the target material, getting attracted to the cathode(target). The cathode is generally cooled because sputtering generates heat. The target molecules then float around, and some of it lands on the wafer(anode), hence, the thin layer of the target material on the wafer is attained. The anode can be cooled or heated.&lt;/p&gt;
+
+&lt;!-- Image for Sputtering --&gt;
+
+&lt;p&gt;&lt;img src=&quot;\images\Fab02.jpg&quot; alt=&quot;Fab02&quot; /&gt;&lt;/p&gt;
+
+&lt;h5 id=&quot;process&quot;&gt;Process&lt;/h5&gt;
+&lt;p&gt;The substrates used, must firstly undergo the cleaning process in order to remove most of the impurities from the substrates’ surface. The substrate is attached to the substrate holders using pins as shown in fig 1. This substrate holder is then placed inside the cylindrical sputtering chamber in an upright position. The target is labeled in the figure shown. The distance between the target and the substrate should optimally be 11.5cm. The chamber is then closed and the all the gas inlets are off.&lt;/p&gt;
+
+&lt;!-- Two process images --&gt;
+
+&lt;p&gt;&lt;img src=&quot;\images\Fab03.jpg&quot; alt=&quot;Fab01&quot; title=&quot;Substrates on substrate holder&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;\images\Fab04.jpg&quot; alt=&quot;Fab01&quot; title=&quot;Chamber in RF sputtering machine&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;All the air is vented out of the cylindrical sputtering equipment. The rotary pump is turned on in order to create a vacuum of the order of 10-2. Upon achieving the vacuum of the mentioned order, the turbo pump is turned on. The pumps are allowed to work till the vacuum of about 10-6 order is attained. This is done to assure that no air remains inside the chamber, which further ensures that no impurity pertains which may be able to strand or interfere with the process in any way.&lt;/p&gt;
+
+&lt;p&gt;One must know that it takes a significant amount of time to attain the vacuum level of 10-6 order. The time is generally 6 to 8 hours. So, one must equip patience while engaging in the process.&lt;/p&gt;
+
+&lt;p&gt;When the atmosphere inside the chamber is clean, the Argon inlet is opened, so as to allow the formation of plasma. The process takes place at about vacuum of order 10-2. The plasma once formed initiates deposition, as ionized argon molecules transfer their momentum to the target material and remove molecules. These molecules once freed roam freely in the chamber and some of them may attach to the substrate’s surface. Therefore, a thin layer of ZnO is deposited on the surface of the substrate. The time taken after the formation of plasma estimates to somewhere between 6 to 7 hours for proper deposition to occur.&lt;/p&gt;
+
+&lt;h4 id=&quot;electron-beam-deposition&quot;&gt;ELECTRON BEAM DEPOSITION&lt;/h4&gt;
+
+&lt;h5 id=&quot;theory-of-e-beam-deposition&quot;&gt;Theory of E. Beam Deposition&lt;/h5&gt;
+&lt;p&gt;The electron beam is concentrated on a target metal. This raises the temperature of the metal to the point of vaporization of the metal. Once the metal vaporizes it is made to conveniently condense on the wafer placed in vicinity. Hence, a thin film of metal is formed on the substrate’s surface.&lt;/p&gt;
+
+&lt;h5 id=&quot;process-1&quot;&gt;Process&lt;/h5&gt;
+&lt;p&gt;The substrate, after ZnO deposition, is loaded in an electron beam machine. Vacuum is created in the chamber to remove the chances of encountering impurities. The vacuum is created by using the backing and roughing valve. A very high vacuum is created, of the order 10-6 and a temperature of 100°C is attained.&lt;/p&gt;
+
+&lt;p&gt;The metal of choice is aluminum (Al). A thin film of aluminum is formed on the surface coated with ZnO. The metal is placed on a boat. The electron beam is focused on the metal. The metal first melts and then vaporizes. The vapor condenses on the substrate and hence a thin film of Aluminum is formed.&lt;/p&gt;
+
+&lt;!-- Image of Electron Beam Machine --&gt;
+&lt;p&gt;&lt;img src=&quot;\images\Fab05.jpg&quot; alt=&quot;Fab05&quot; title=&quot;Electron Beam Machine&quot; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;mono-photo-lithography&quot;&gt;MONO PHOTO-LITHOGRAPHY&lt;/h4&gt;
+
+&lt;p&gt;From this point forth in the fabrication of SAW, the substrate coated with ZnO and Aluminum will be called “work piece” for convenience, in the following report. The substrate surface is spin coated with photo-resist. The spin coating machine is effectively run for 1 minute at 1000 rpm. This forms a uniform coat of photo-resist on the surface of the substrate. One must remember that the process must be done in yellow light. The bonds of photo-rest are weaker with the substrate in yellow light.&lt;/p&gt;
+
+&lt;!-- Image of Spin Coating Machine and SUbstrate caoted --&gt;
+&lt;p&gt;&lt;img src=&quot;\images\Fab06.jpg&quot; alt=&quot;Fab01&quot; title=&quot;Spin Coating Machine&quot; /&gt;
+&lt;img src=&quot;\images\Fab07.jpg&quot; alt=&quot;Fab01&quot; title=&quot;Substrate Spin Coated with photo resist&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;After spin coating, the workpiece, already coated with photo-resist, is kept in the heater at a temperature of 90°C for half an hour. This is “pre-baking”. The heated workpiece is then placed under a mask aligner such that parts of the workpiece coated with photo-resist can selectively undergo UV exposure. The photoresist when exposed to UV rays, strengthens its bonds with the work piece. The mask plays a major role in the above process. The parts which are not supposed to be left covered with the photo-resist are not exposed to UV rays. The UV exposure is done for about 13 seconds. Note that the mask used is unique to the SAW device.&lt;/p&gt;
+
+&lt;!-- Mask Machine Microscope --&gt;
+&lt;p&gt;&lt;img src=&quot;\images\Fab08.jpg&quot; alt=&quot;Fab08&quot; title=&quot;Mask for SAW Device&quot; /&gt;
+&lt;img src=&quot;\images\Fab09.png&quot; alt=&quot;Fab09&quot; title=&quot;Microscope&quot; /&gt;&lt;/p&gt;
+
+&lt;h5 id=&quot;developing&quot;&gt;DEVELOPING&lt;/h5&gt;
+
+&lt;p&gt;The workpiece, after being selectively exposed to UV rays, is then straightaway transferred to a developing solution. It is kept in the solution for 2 minutes. The developing solution is used to remove the photoresist from the parts of the workpiece, not exposed to UV rays. For example, the delay region. This is a crucial step because if not done carefully, the parts exposed to the UV ray will also have to part with their protective photoresist. The work piece is transferred to a microscope for checking, such that one makes sure that the sample is developed properly.&lt;/p&gt;
+
+&lt;!-- Contact Pad Image under microscope --&gt;
+
+&lt;p&gt;&lt;img src=&quot;\images\Fab10.jpg&quot; alt=&quot;Fab10&quot; title=&quot;Contact Pad seen under microscope&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;\images\Fab11.jpg&quot; alt=&quot;Fab11&quot; title=&quot;Image under Microscope&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;After development of the sample, it is kept at a temperature of 120°C for 20 minutes and then taken out for etching.&lt;/p&gt;
+
+&lt;h5 id=&quot;etching&quot;&gt;ETCHING&lt;/h5&gt;
+
+&lt;p&gt;Etching is the process which can be described as the opposite of depositing. The Aluminum is supposed to be etched from the surface except from the electrodes of IDT. This is where the photoresist plays a major role. It protects the aluminum that forms the electrodes from getting etched.
+The etchant is a solution containing potassium ferricyanide, potassium chloride and deionized water in the ratio 10:1:100. The work piece is dipped with the etchant and then, cleaned with deionized water. Etching is again a crucial process and should be done carefully. Aluminum is used to make the electrodes, as it is a very stable and conductive metal. Gold and Platinum have better properties than Aluminum, but they are highly expensive.&lt;/p&gt;
+
+&lt;!-- Work Dipped in Etchant --&gt;
+
+&lt;p&gt;&lt;img src=&quot;\images\Fab12.png&quot; alt=&quot;Fab12&quot; title=&quot;Work Dipped in Etchant&quot; /&gt;&lt;/p&gt;
+
+&lt;h5 id=&quot;packaging&quot;&gt;PACKAGING&lt;/h5&gt;
+
+&lt;p&gt;The work piece is diced in order to isolate the devices on the wafer or the corning glass substrate. The device that resulted is of dimensions 1 cm and 0.5 cm and has passed the scrutiny of the checking process is then placed on a header and the contact pads on the device are connected to the contact pads of the header. This is done to establish an internal connection between the pins of the packaging and the actual device.&lt;/p&gt;
+
+&lt;p&gt;The device after the cap is put on the header, is input into a Vector Network Analyzer. The resultant is the graph depicted in the image given below.&lt;/p&gt;
+
+&lt;!-- SAW on header Vector Network Analyser --&gt;
+&lt;p&gt;&lt;img src=&quot;\images\Fab13.jpg&quot; alt=&quot;Fab13&quot; title=&quot;SAW on header&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;\images\Fab14.jpg&quot; alt=&quot;Fab14&quot; title=&quot;Vector Network Analyser&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;In a Vector Network Analyzer, an electromagnetic wave is input into the device. The input electromagnetic wave is of the frequency range 50 to 150 MHz. The output wave is observed. The graph of gain and frequency is made and a number of observations are derived from it.&lt;/p&gt;
+
+&lt;p&gt;The frequency which is allowed to pass through our filter is given by the formulae,&lt;/p&gt;
+
+&lt;div style=&quot;text-align: center;&quot;&gt;
+  &lt;p&gt;F=v/λ&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;p&gt;where, F = frequency allowed to pass, 
+	   λ = acoustic wavelength
+	and v is given by the property of substrates.&lt;/p&gt;
+
+&lt;!-- Substrate Info to VNA --&gt;
+&lt;!-- ![Fab15]( \images\Fab15.jpg &quot;Substrate input to VNA&quot;) --&gt;
+
+&lt;p&gt;One of the most significant observations is that our filter is able to filter a frequency of 98.18Mhz, as from the graph the loss is minimum in this case.&lt;/p&gt;
+
+&lt;h3 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h3&gt;
+
+&lt;p&gt;The fabrication of an Integrated SAW Device filter is complete. The filter is able to let an AC voltage of frequency 98.18 MHz pass through it. The SAW filters find their applications in a number of communication systems, for example, mobile/wireless transceivers, radio frequency and intermediate frequency filters, etc.&lt;/p&gt;
+</content>
+ </entry>
+ 
+
+</feed>
