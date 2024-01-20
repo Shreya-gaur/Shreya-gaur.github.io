@@ -50,6 +50,13 @@ You can find more information about my credentials on this website. During my wo
 </p>
 </details>  
 
+#### 2022
+<details><summary markdown="span">Purdue University, West Lafayette, IN</summary>
+<p>
+    I joined Purdue university at the Fall 2022 batch and spent my initial two semesters working on developing a computer vision based application for Cancer Metastasis Detection in Pathology samples. I also did a semester long computer architecture project in GEM5 to implement Load Value Prediction in an Out of Order CPU. 
+</p>
+</details>
+
 
 ## Projects
 
@@ -58,9 +65,9 @@ More information about what I learned can be found in the posts below.
 1. [Fabrication of SAW Devices](/2022/12/28/fabrication-SAW/)
 2. [Deep Double Descent](/2022/12/29/double-descent/)
 
-<!-- For more information on my time at Purdue University, West Lafayette look at the blog below: -->
+For more information on my time at Purdue University, West Lafayette look at the blog below:
+1. [Load Value Prediction](/2022/12/30/load_value_prediction/)
 
-<!-- 1. [Fall 2022](//) -->
 
 ## Contacts
 
