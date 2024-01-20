@@ -80,7 +80,7 @@
       <span class="sidebar-nav-item">Currently v2.1.0</span>
     </nav>
 
-    <p>&copy; 2023. All rights reserved.</p>
+    <p>&copy; 2024. All rights reserved.</p>
   </div>
 </div>
 
@@ -97,7 +97,7 @@
 
 <h5 id="related-work">Related Work</h5>
 
-<p>The benefit of value locality i s two-fold: First, the early availability of predicted load values enables dependent instructions to execute sooner and, second, accurate predictions relieve the memory system from fetching redundant data. In 1995, the first of these concepts was introduced to perform loads very early and verify in parallel to achieve zero-cycle loads in some cases <a href="https://web.eecs.umich.edu/~taustin/papers/MICRO28-zcl.pdf">Aus95</a>. The second concept is that the CPU can bypass the data caches altogether, thus acquiring data that may not even exist in cache. Both concepts were explored in the seminal paper on value locality from 1996. Their basic structures were the load value prediction table (LVPT), load classification table (LCT), and constant verification unit (CVU) <a href="https://course.ece.cmu.edu/~ece740/f10/lib/exe/fetch.php?media=valuelocalityandloadvalueprediction.pdf">Lip96</a>. The LVPT caches prior loaded data values. When it predicts a value, it forwards it to younger instruction. The LCT classifies the confidence as “unpredictable”, “predictable”, or “constant”. In the first two cases, the load must execute fully on data cache, then compare the true load value with the prediction. If correct, the LCT increases its confidence; otherwise, it decreases. “Constant” loads do not access memory at all. In 1998, researchers noted that mispredictions do not require all younger instructions to squash, but only those with directly-dependent data <a href="https://userweb.cs.txstate.edu/~burtscher/papers/tr98.pdf">Bur98</a>. Unfortunately, this selective squashing technique was considered too hard at the time <a href="https://core.ac.uk/download/pdf/54846841.pdf">Pai98</a>. Other methods to increase prediction accuracy included tracking prediction history and using statistical inference.</p>
+<p>The benefit of value locality is two-fold: First, the early availability of predicted load values enables dependent instructions to execute sooner and, second, accurate predictions relieve the memory system from fetching redundant data. In 1995, the first of these concepts was introduced to perform loads very early and verify in parallel to achieve zero-cycle loads in some cases <a href="https://web.eecs.umich.edu/~taustin/papers/MICRO28-zcl.pdf">Aus95</a>. The second concept is that the CPU can bypass the data caches altogether, thus acquiring data that may not even exist in cache. Both concepts were explored in the seminal paper on value locality from 1996. Their basic structures were the load value prediction table (LVPT), load classification table (LCT), and constant verification unit (CVU) <a href="https://course.ece.cmu.edu/~ece740/f10/lib/exe/fetch.php?media=valuelocalityandloadvalueprediction.pdf">Lip96</a>. The LVPT caches prior loaded data values. When it predicts a value, it forwards it to younger instruction. The LCT classifies the confidence as “unpredictable”, “predictable”, or “constant”. In the first two cases, the load must execute fully on data cache, then compare the true load value with the prediction. If correct, the LCT increases its confidence; otherwise, it decreases. “Constant” loads do not access memory at all. In 1998, researchers noted that mispredictions do not require all younger instructions to squash, but only those with directly-dependent data <a href="https://userweb.cs.txstate.edu/~burtscher/papers/tr98.pdf">Bur98</a>. Unfortunately, this selective squashing technique was considered too hard at the time <a href="https://core.ac.uk/download/pdf/54846841.pdf">Pai98</a>. Other methods to increase prediction accuracy included tracking prediction history and using statistical inference.</p>
 
 <h3 id="implementation-details">Implementation details</h3>
 
@@ -193,6 +193,15 @@
 <div class="related">
   <h2>Related Posts</h2>
   <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/2023/03/20/convolution_kernel/">
+            Basic Convolution and GEMM
+            <small>20 Mar 2023</small>
+          </a>
+        </h3>
+      </li>
     
       <li>
         <h3>

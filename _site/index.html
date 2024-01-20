@@ -80,13 +80,114 @@
       <span class="sidebar-nav-item">Currently v2.1.0</span>
     </nav>
 
-    <p>&copy; 2023. All rights reserved.</p>
+    <p>&copy; 2024. All rights reserved.</p>
   </div>
 </div>
 
 
     <div class="content container">
       <div class="posts">
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="/2023/03/20/convolution_kernel/">
+        Basic Convolution and GEMM
+      </a>
+    </h1>
+
+    <span class="post-date">20 Mar 2023</span>
+
+    <style>body {text-align: justify}</style>
+
+<h3 id="introduction">Introduction</h3>
+
+<p>AlexNet is a popular convolutional neural network architecture designed by Alex Krizhevsky, Ilya Sutskever, and Geoffrey Hinton. AlexNet won the ImageNet Large Scale Visual Recognition Challenge (ILSVRC) in 2012 and significantly outperformed previous state-of-the-art methods. The architecture consists of 5 convolutional layers, 3 fully connected layers, and an output layer. In this report, I will compare the implementation of the convolutional layers and the matrix multiplication in the fully connected layers of AlexNet on a CPU and a GPU. The GPU implementation of Convolutional Layer achieved an average speed up of 99.458% compared to the CPU implementation. For the Matrix Multiplication implementation, the optimized GPU implementation gains an average speed up of 99.86% compared to CPU implementation.</p>
+
+<p><img src=".\images\alexnet.png" alt="alexnet" /></p>
+
+<h3 id="convolutional-layer">Convolutional Layer</h3>
+
+<h2 id="comparison-between-cpu-and-gpu-implementations">Comparison between CPU and GPU implementations</h2>
+
+<p>I implemented the convolutional layers of AlexNet on both CPU and GPU. The GPU used for the implementation is Nvidia Volta V100. An important feature of Volta V100 GPU includes configurable 96KB shared memory. I have used this shared memory and constant memory features of CUDA to optimize the GPU implementations of both Matrix Multiplication and Convolution. With the use of shared memory, the implementation of Convolutional Layer attains an average occupancy of 96% per SM.</p>
+
+<p>The naïve CPU implementation is taken in which the computation of each element of the output is carried out sequentially for all the different channels of the filters. This takes on average 3.266 seconds to complete for each layer. Compared to this, the optimized GPU implementation on average takes only 1ms to complete with 0 errors. The graph below depicts the execution time taken by GPU and CPU for different layers in seconds.</p>
+
+<p><img src=".\images\graph02.png" alt="graph1" /></p>
+
+<p>The speedups achieved by the GPU implementation of different layers on AlexNet can be seen in the graph below.</p>
+
+<h2 id="basic-gpu-implementation">Basic GPU implementation</h2>
+
+<p>My initial implementation of the Convolutional layers on the GPU utilized the global memory to store the inputs and filters for the convolution operation. The implementation was not parallelized across channels and the number of threads was decided based upon the number of output elements to be computed. The basic idea was to assign the task of computation of one output pixel to a single thread for all the channels of input. This was a very naïve approach was taken basically taken from the CPU implementation of the convolutional layers.</p>
+
+<p>For the optimization of this naïve approach, I decided to exploit the input and feature reuse with the 3D convolution operation. The input is reused for each batch of the filter and the filter is reused by each batch of the input. Here since the computation only takes place for a single batch, it was more effective to put the input in the shared memory as it will be used by all the filters. For further update, one can even put each layer of filter in the shared memory.</p>
+
+<p>I also exploited the fact that the bias is necessarily constant and does not change throughout the runtime. Therefore, it is a perfect candidate to be put in the constant memory. The filter cannot be put in the constant memory due to restricted space in the constant memory.</p>
+
+<h2 id="optimized-gpu-implementation-with-shared-memory">Optimized GPU implementation with Shared Memory</h2>
+
+<p>The shared memory implementation also parallelises across the channels of the input. Convolution between each channel of the filter and the corresponding filter is stored in the thread registers and eventually an atomicAdd() operation is used in order to compute the sum of each of the thread’s output for an input channel. The atomicAdd() operation add additional overhead but the gain in speedup is considerable as compared to the naïve global memory-based implementation in GPU as can be seen from the graph below.</p>
+
+<p><img src=".\images\graph03.png" alt="graph03" /></p>
+
+<p>The Optimized GPU implementation gains average speed up of 99% compared to the GPU global memory-based implementation. The speed up gained in case of each of the layers can be seem in the graph below.</p>
+
+<p><img src=".\images\graph04.png" alt="graph04" /></p>
+
+<p>The GPU traces for different kernels and cudaMemcpy() in case of optimized GPU shared memory-based implementation is seen in the graph below.</p>
+
+<p><img src=".\images\graph05.png" alt="graph05" /></p>
+
+<p>The bias_Add kernel is used to add the bias value to each of the output elements after the convolution results are outputted. The reason to employ a separate bias_Add kernel are specific to the loading and accessing of input data in the shared memory. The input data is loaded in form of strips of tiles of size tileW = BLOCK_SIZE + fShape.width – args.strideW and tileH = BLOCK_SIZE + fShape.width – args.strideH. The dimensions of the block, therefore, are (tileW, threadsPerSubblock), where threadsperSubblock decides the number of rows which are to be loaded in one strip of the tile. The thread blocks load strips of their tiles of size tileH*tileW one by one and put that into their shared memory. This process for a tile is sequential. To access the elements of shared input one must do this sequential retrieving which makes addition of the bias complex. With the experiments I conducted, the bias was getting added multiple times to a single element of output. To avoid this confusion altogether, I assigned the task of adding bias to a different kernel.</p>
+
+<p>The occupancy of the optimized GPU implementation calculated by CUDA-Occupancy-Calculator is shown in the graph below for different layers with the initial respective Block Size and shared memory usage. The current implementation has a very good occupancy of 96% on average for all the layers.</p>
+
+<p><img src=".\images\graph06.png" alt="graph06" /></p>
+
+<h3 id="matrix-multiplication">Matrix Multiplication</h3>
+
+<p>Matrix multiplication is a fundamental operation in deep learning, and it is used extensively in convolutional neural networks (CNNs). AlexNet uses matrix multiplication in its fully connected layers. In this report, we will compare the implementation of matrix multiplication for the fully connected layers of AlexNet on a CPU and a GPU. We implemented three different versions of the GPU implementation: an unoptimized global memory-based implementation, an unoptimized unified virtual memory-based implementation, and a shared memory-based optimized implementation.</p>
+
+<h2 id="comparison-between-cpu-and-gpu-implementations-1">Comparison between CPU and GPU Implementations</h2>
+
+<p>The CPU implementation of Matrix Multiplication does use the concept of tiling, i.e, a tile of the output element is computed by adding the partial sums of matrix multiplication of tiles of the inputs A and B. This however done one tile of the output at a time hence there is a great scope of parallelization. Each of the individual tiles of the output can be computed by a block of size (args.tileW, args.tileH). This is implemented in a basic GPU implementation of the algorithm. The graph comparing the time taken by GEMM kernel for both the approaches can be seen below:</p>
+
+<p><img src=".\images\graph07.png" alt="graph07" /></p>
+
+<p>It can be observed that even the unoptimized implementation on the GPU significantly outperforms the CPU. The speed ups observed can be seen the graph below.</p>
+
+<p><img src=".\images\graph08.png" alt="graph08" /></p>
+
+<h2 id="basic-gpu-implementation-with-unified-virtual-memory">Basic GPU implementation with Unified Virtual Memory</h2>
+
+<p>Unified Memory is a single memory address space accessible from any processor in a system. The unified memory alleviates the usage of cudaMemcpy() completely the GPU can get the data directly from the CPU through page faults. For the next part of my implementation, I used Unified Virtual Memory in order to transfer data from the host to the device. The graph depicting the performance of GEMM kernel of the UVM based GPU implementation and the basic GPU implementation with the usual cudaMemcpy() is given below.</p>
+
+<p><img src=".\images\graph09.png" alt="graph09" /></p>
+
+<p>It can be observed that the use of UVM adds on additional overheads in the migration of the data to the device from the host. This can be observed in the graph above. In case of (1, 4096) Input A dimension, the additional overhead increases the execution time a lot. The migration overhead in this simple code is caused by the fact that the CPU initializes the data, and the GPU only uses it once. The overhead can reduce if the data is initialized on the GPU itself.</p>
+
+<h2 id="optimized-gpu-implementation-with-shared-memory-1">Optimized GPU implementation with Shared Memory</h2>
+
+<p>In the Optimized GPU implementation of matrix multiplication, the tiles of input A and input B are stored in the shared memory. The threads of each thread block co-ordinate to store the elements of their individual tiles in the shared memory. This approach offers significant performance improvement compared to the basic implementation where the inputs are stored in the global memory. The graph below shows the performance of the GEMM kernel for the global memory based and shared memory-based implementations.</p>
+
+<p><img src=".\images\graph10.png" alt="graph10" /></p>
+
+<p>As the batch size scales, the shared memory approach shows considerable improvements over the basic global memory-based approach. The speedup gained by implementing the matrix multiplication in the shared memory can be seen in the graph below.</p>
+
+<p><img src=".\images\graph11.png" alt="graph11" /></p>
+
+<p><img src=".\images\graph12.png" alt="graph12" /></p>
+
+<p>The stacked bar graph depicting the performance of the optimized GPU implementation is shown below.</p>
+
+<p><img src=".\images\graph13.png" alt="graph13" /></p>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>The convolutional layers and matrix multiplication layers are implemented in GPU with optimization include use of shared/constant memory. The implementations gain considerable speed-up compared to the CPU implementations.</p>
+
+  </div>
   
   <div class="post">
     <h1 class="post-title">
@@ -105,7 +206,7 @@
 
 <h5 id="related-work">Related Work</h5>
 
-<p>The benefit of value locality i s two-fold: First, the early availability of predicted load values enables dependent instructions to execute sooner and, second, accurate predictions relieve the memory system from fetching redundant data. In 1995, the first of these concepts was introduced to perform loads very early and verify in parallel to achieve zero-cycle loads in some cases <a href="https://web.eecs.umich.edu/~taustin/papers/MICRO28-zcl.pdf">Aus95</a>. The second concept is that the CPU can bypass the data caches altogether, thus acquiring data that may not even exist in cache. Both concepts were explored in the seminal paper on value locality from 1996. Their basic structures were the load value prediction table (LVPT), load classification table (LCT), and constant verification unit (CVU) <a href="https://course.ece.cmu.edu/~ece740/f10/lib/exe/fetch.php?media=valuelocalityandloadvalueprediction.pdf">Lip96</a>. The LVPT caches prior loaded data values. When it predicts a value, it forwards it to younger instruction. The LCT classifies the confidence as “unpredictable”, “predictable”, or “constant”. In the first two cases, the load must execute fully on data cache, then compare the true load value with the prediction. If correct, the LCT increases its confidence; otherwise, it decreases. “Constant” loads do not access memory at all. In 1998, researchers noted that mispredictions do not require all younger instructions to squash, but only those with directly-dependent data <a href="https://userweb.cs.txstate.edu/~burtscher/papers/tr98.pdf">Bur98</a>. Unfortunately, this selective squashing technique was considered too hard at the time <a href="https://core.ac.uk/download/pdf/54846841.pdf">Pai98</a>. Other methods to increase prediction accuracy included tracking prediction history and using statistical inference.</p>
+<p>The benefit of value locality is two-fold: First, the early availability of predicted load values enables dependent instructions to execute sooner and, second, accurate predictions relieve the memory system from fetching redundant data. In 1995, the first of these concepts was introduced to perform loads very early and verify in parallel to achieve zero-cycle loads in some cases <a href="https://web.eecs.umich.edu/~taustin/papers/MICRO28-zcl.pdf">Aus95</a>. The second concept is that the CPU can bypass the data caches altogether, thus acquiring data that may not even exist in cache. Both concepts were explored in the seminal paper on value locality from 1996. Their basic structures were the load value prediction table (LVPT), load classification table (LCT), and constant verification unit (CVU) <a href="https://course.ece.cmu.edu/~ece740/f10/lib/exe/fetch.php?media=valuelocalityandloadvalueprediction.pdf">Lip96</a>. The LVPT caches prior loaded data values. When it predicts a value, it forwards it to younger instruction. The LCT classifies the confidence as “unpredictable”, “predictable”, or “constant”. In the first two cases, the load must execute fully on data cache, then compare the true load value with the prediction. If correct, the LCT increases its confidence; otherwise, it decreases. “Constant” loads do not access memory at all. In 1998, researchers noted that mispredictions do not require all younger instructions to squash, but only those with directly-dependent data <a href="https://userweb.cs.txstate.edu/~burtscher/papers/tr98.pdf">Bur98</a>. Unfortunately, this selective squashing technique was considered too hard at the time <a href="https://core.ac.uk/download/pdf/54846841.pdf">Pai98</a>. Other methods to increase prediction accuracy included tracking prediction history and using statistical inference.</p>
 
 <h3 id="implementation-details">Implementation details</h3>
 
