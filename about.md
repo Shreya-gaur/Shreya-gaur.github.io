@@ -67,6 +67,7 @@ More information about what I learned can be found in the posts below.
 
 For more information on my time at Purdue University, West Lafayette look at the blog below:
 1. [Load Value Prediction](/2022/12/30/load_value_prediction/)
+2. [Basic Convolution and GEMM Kernel](2023/3/20/convolution_kernel/)
 
 
 ## Contacts
